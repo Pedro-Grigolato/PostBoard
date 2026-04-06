@@ -1,6 +1,7 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import SobreScreen from '../screens/SobreScreen';
 import { Text } from 'react-native';
 
 // Importa as telas
@@ -18,8 +19,8 @@ function FeedStack() {
     return (
         <Stack.Navigator
             screenOptions={{
-                headerStyle: { backgroundColor: '#1e3a5f' },
-                headerTintColor: '#ffffff',
+                headerStyle: { backgroundColor: '#064e3b' },
+                headerTintColor: '#d1fae5',
                 headerTitleStyle: { fontWeight: 'bold' },
             }}
         >
@@ -45,7 +46,7 @@ export default function AppNavigator() {
             screenOptions={({ route }) => ({
                 headerShown: false,   // O Stack já mostra o header
                 tabBarShowLabel: false,
-                tabBarActiveTintColor: '#1a56db',
+                tabBarActiveTintColor: '#059669',
                 tabBarInactiveTintColor: '#9ca3af',
                 tabBarStyle: {
                     backgroundColor: '#ffffff',
@@ -78,6 +79,17 @@ export default function AppNavigator() {
                     headerShown: true,
                     headerStyle: { backgroundColor: '#1e3a5f' },
                     headerTintColor: '#ffffff',
+                }}
+            />
+            <Tab.Screen
+                name="SobreTab"
+                component={FormularioScreen}
+                options={{
+                    tabBarLabel: 'Sobre',
+                    headerShown: true,
+                    title: 'Sobre',
+                    headerStyle: {backgroundColor: '#064e3b'},
+                    headerTintColor: '#d1fae5',
                 }}
             />
         </Tab.Navigator>

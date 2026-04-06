@@ -2,17 +2,15 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
 export default function DetalhesScreen({ navigation, route }) {
-  // Recebe o post inteiro
-  const { post } = route.params;
+  const { postId, titulo, autorId, body } = route.params;
 
   return (
     <View style={styles.container}>
-      <Text style={styles.titulo}>Detalhes do Post</Text>
+      <Text style={styles.titulo}>{titulo}</Text>
 
-      <Text style={styles.info}>Post ID: {post.id}</Text>
-      <Text style={styles.info}>Título: {post.titulo}</Text>
-      <Text style={styles.info}>Autor ID: {post.autorId}</Text>
-      <Text style={styles.subtitulo}>{post.corpo}</Text>
+      <Text style={styles.info}>Post ID: {postId}</Text>
+      <Text style={styles.info}>Autor ID: {autorId}</Text>
+      <Text style={styles.subtitulo}>Conteúdo: {body}</Text>
 
       <TouchableOpacity
         style={styles.botao}

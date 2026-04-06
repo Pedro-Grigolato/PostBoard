@@ -21,7 +21,7 @@ export default function FeedScreen({ navigation }) {
     id: 1,
     titulo: 'Primeiro Post',
     autorId: 7,
-    corpo: 'Aqui está o conteúdo completo do primeiro post.'
+    body: 'Aqui está o conteúdo completo do primeiro post.'
   };
 
   return (
@@ -35,7 +35,12 @@ export default function FeedScreen({ navigation }) {
       {/* Botão temporário para testar a navegação */}
       <TouchableOpacity
         style={styles.botao}
-        onPress={() => navigation.navigate('Detalhes', { post })}
+        onPress={() => navigation.navigate('Detalhes', { 
+          postId: post.id,
+          titulo: post.titulo,
+          autorId: post.autorId,
+          body: post.body
+        })}
       >
         <Text style={styles.textoBotao}>
           Ver detalhe do post 1
@@ -82,3 +87,20 @@ const styles = StyleSheet.create({
     fontWeight: '300',
   },
 });
+
+
+// são utilizadas prop navigations - telas registradas no navegador, exemplo:
+/*
+export default function FeedScreen({ navigation }) {
+  return (
+    <TouchableOpacity onPress={() => navigation.navigate('Detalhes', {
+      postId: post.id,
+      titulo: post.titulo,
+      autorId: post.autorId,
+      body: post.body
+    })}>
+      <Text>Ver detalhe do post 1</Text>
+    </TouchableOpacity>
+  );
+}
+*/

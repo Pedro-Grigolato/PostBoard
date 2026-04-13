@@ -1,51 +1,109 @@
-import React, { useLayoutEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
+import {
+  View, Text, FlatList, StyleSheet,
+  TouchableOpacity, RefreshControl,
+} from 'react-native';
+import { getPosts }      from '../services/api';
+import PostCard          from '../components/PostCard';
+import LoadingIndicator  from '../components/LoadingIndicator';
+import EmptyState        from '../components/EmptyState';
 
 export default function FeedScreen({ navigation }) {
-  // Botão "+" no header
+  const [posts, setPosts]           = useState([]);
+  const [loading, setLoading]       = useState(true);
+  const [erro, setErro]             = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
         <TouchableOpacity
-          onPress={() => navigation.navigate('FormulárioTab')}
-          style={{ marginRight: 12 }}
+          onPress={() => navigation.navigate('FormularioTab')}
+          style={{ marginRight: 4, padding: 4 }}
         >
-          <Text style={styles.botaoHeader}>+</Text>
+          <Text style={{ color: '#fff', fontSize: 28, fontWeight: '300' }}>+</Text>
         </TouchableOpacity>
       ),
     });
   }, [navigation]);
 
-  // Exemplo de post
-  const post = {
-    id: 1,
-    titulo: 'Primeiro Post',
-    autorId: 7,
-    body: 'Aqui está o conteúdo completo do primeiro post.'
-  };
+  useEffect(() => {
+    carregarPosts();
+  }, []);
+
+  async function carregarPosts() {
+    try {
+      setLoading(true);
+      setErro(null);
+      const dados = await getPosts();
+      setPosts(dados);
+    } catch (e) {
+      setErro('Não foi possível carregar os posts.\nVerifique sua conexão.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function onRefresh() {
+    try {
+      setRefreshing(true);
+      setErro(null);
+      const dados = await getPosts();
+      setPosts(dados);
+    } catch (e) {
+      setErro('Erro ao atualizar.');
+    } finally {
+      setRefreshing(false);
+    }
+  }
+
+  if (loading) {
+    return <LoadingIndicator mensagem="Carregando posts..." />;
+  }
+
+  if (erro && posts.length === 0) {
+    return (
+      <EmptyState
+        icone="⚠"
+        titulo="Ops! Algo deu errado"
+        mensagem={erro}
+        textoBotao="Tentar novamente"
+        onBotao={carregarPosts}
+      />
+    );
+  }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.titulo}>Feed de Posts</Text>
-
-      <Text style={styles.subtitulo}>
-        Aqui aparecerá a lista de posts da API.
-      </Text>
-
-      {/* Botão temporário para testar a navegação */}
-      <TouchableOpacity
-        style={styles.botao}
-        onPress={() => navigation.navigate('Detalhes', { 
-          postId: post.id,
-          titulo: post.titulo,
-          autorId: post.autorId,
-          body: post.body
-        })}
-      >
-        <Text style={styles.textoBotao}>
-          Ver detalhe do post 1
-        </Text>
-      </TouchableOpacity>
+      <FlatList
+        data={posts}
+        keyExtractor={(item) => String(item.id)}
+        renderItem={({ item }) => (
+          <PostCard
+            post={item}
+            onPress={() => navigation.navigate('Detalhes', { post: item })}
+          />
+        )}
+        ListEmptyComponent={
+          <EmptyState
+            icone="📋"
+            titulo="Nenhum post encontrado"
+            mensagem="A lista está vazia no momento."
+          />
+        }
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={['#1a56db']}
+            tintColor="#1a56db"
+          />
+        }
+        contentContainerStyle={
+          posts.length === 0 ? styles.listaVazia : styles.lista
+        }
+        ItemSeparatorComponent={() => <View style={styles.separador} />}
+      />
     </View>
   );
 }
@@ -54,53 +112,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f3f4f6',
-    alignItems: 'center',
+  },
+  lista: {
+    padding: 16,
+    paddingBottom: 32,
+  },
+  listaVazia: {
+    flex: 1,
     justifyContent: 'center',
-    padding: 24,
   },
-  titulo: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1e3a5f',
-    marginBottom: 8,
-  },
-  subtitulo: {
-    fontSize: 15,
-    color: '#6b7280',
-    textAlign: 'center',
-    marginBottom: 32,
-  },
-  botao: {
-    backgroundColor: '#1a56db',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 8,
-  },
-  textoBotao: {
-    color: '#fff',
-    fontSize: 15,
-    fontWeight: '600',
-  },
-  botaoHeader: {
-    color: '#fff',
-    fontSize: 28,
-    fontWeight: '300',
+  separador: {
+    height: 12,
   },
 });
-
-
-// são utilizadas prop navigations - telas registradas no navegador, exemplo:
-/*
-export default function FeedScreen({ navigation }) {
-  return (
-    <TouchableOpacity onPress={() => navigation.navigate('Detalhes', {
-      postId: post.id,
-      titulo: post.titulo,
-      autorId: post.autorId,
-      body: post.body
-    })}>
-      <Text>Ver detalhe do post 1</Text>
-    </TouchableOpacity>
-  );
-}
-*/
